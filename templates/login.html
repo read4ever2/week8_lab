@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!-- Displays login page for the website -->
+<html lang="en">
+
+<head>
+	<title>Login</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+	<header>
+		<h1>Please Log In</h1>
+	</header>
+
+	{%if error %}
+	<p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+
+	<form action="{{ url_for('handle_login') }}" method="post">
+		<div>
+			<label for="username">Username</label>
+        <input type="text" id="username" name="username">
+    </div>
+    <div>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password">
+    </div>
+    <div>
+        <input type="submit" class="submit" value="Log In">
+    </div>
+</form>
+
+<p>Page Creator: Will Feighner</p>
+<p>Last Updated: 2021-05-01</p>
+<p><a href="{{ url_for('show_home') }}">Return Home</a></p>
+<!--
+IDE version: PyCharm Professional 2021.1.1
+-->
+</body>
+</html>

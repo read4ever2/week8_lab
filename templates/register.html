@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- Displays register page of the website -->
+<html lang="en">
+
+<head>
+	<title>Registration</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+
+	{% if error %}
+	<p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+
+<form action="{{ url_for('handle_data') }}" method="post">
+    <div>
+        <label for="real_name">Name</label>
+        <input type="text" id="real_name" name="real_name">
+    </div>
+    <div>
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email">
+    </div>
+    <div>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username">
+    </div>
+    <div>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password">
+    </div>
+    <div>
+        <input type="submit" class="submit" value="Register">
+    </div>
+</form>
+<p>Page Creator: Will Feighner</p>
+<p>Last Updated: 2021-04-26</p>
+<p><a href="{{ url_for('show_home') }}">Return Home</a></p>
+<!--
+IDE version: PyCharm Professional 2021.1.1
+-->
+</body>
+</html>

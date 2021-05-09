@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!-- This page lists basic information about the 8th generation of video game consoles -->
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../static/css/main.css"/>
+    <title>8th Generation Game Consoles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+<header>
+    <h1>
+        8th Generation Consoles </h1>
+</header>
+
+<table class="products">
+    <tr>
+        <th>Manufacturer</th>
+        <th>Model</th>
+        <th>Timeframe</th>
+        <th>MSRP</th>
+        <th>Units sold (to date)</th>
+        <th>Image</th>
+    </tr>
+    <tr>
+        <td rowspan="3">
+            <h2>Sony</h2>
+        </td>
+        <td><a href="https://www.playstation.com/en-us/ps4/">Playstation 4</a></td>
+        <td>2013 - Present</td>
+        <td class="num">$ 399.99</td>
+        <td rowspan="3" class="num">113,600,000</td>
+        <td rowspan="3"><img src="../static/PS4-Console-wDS4.png" alt="Playstation 4"></td>
+    </tr>
+    <tr>
+        <td>Playstation 4 Slim</td>
+        <td>2016 - 2021</td>
+        <td class="num">$ 299.99</td>
+    </tr>
+    <tr>
+        <td>Playstation 4 Pro</td>
+        <td>2016 - 2021</td>
+        <td class="num">$ 399.99</td>
+    </tr>
+    <tr>
+        <td rowspan="3"><h2>Microsoft</h2></td>
+        <td><a href="https://www.xbox.com/en-US/consoles/xbox-one-s">Xbox One</a></td>
+        <td>2013 - 2016</td>
+        <td class="num">$ 499.99</td>
+        <td rowspan="3" class="num">46,900,000</td>
+        <td rowspan="3"><img src="../static/Microsoft-Xbox-One-Console-Set-wKinect.jpg"
+                             alt="Xbox One"></td>
+    </tr>
+    <tr>
+        <td>One X</td>
+        <td>2017 - 2020</td>
+        <td class="num">$ 499.99</td>
+    </tr>
+    <tr>
+        <td>One S</td>
+        <td>2016 - Present</td>
+        <td class="num">$ 299.99</td>
+    </tr>
+    <tr>
+        <td><h2>Nintendo</h2></td>
+        <td><a href="https://www.nintendo.com/switch/">Switch</a></td>
+        <td>2017 - Present</td>
+        <td class="num">$ 299.99</td>
+        <td class="num">79,870,000</td>
+        <td><img src="../static/Nintendo-Switch-wJoyCons-BlRd-Standing-FL.jpg"
+                 alt="Nintendo Switch"></td>
+    </tr>
+</table>
+
+
+<a href="{{ url_for('show_previous') }}"><h3>Previous Generations</h3></a>
+<p><a href="{{ url_for('show_home') }}">Return Home</a></p>
+
+
+</body>
+</html>
