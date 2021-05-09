@@ -67,7 +67,7 @@ def show_update():
 def handle_update():
     """processes update user password"""
     error = None
-    if request.method == "Post":
+    if request.method == "POST":
         username = request.form.get('username')
         old_pass = request.form.get('old_password')
         new_pass = request.form.get('new_password')
@@ -77,20 +77,15 @@ def handle_update():
             error = 'Passwords do not match'
             return redirect(url_for('show_update', error=error))
 
-        if is_registered(username):
-            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
-                lines = csv.reader(pass_file)
-                for line in lines:
-                    if username in line:
-                        hash_pass = line[1]
-                        break
+        hash_pass = ''
+        hash_pass = get_hash(hash_pass, username)
 
         temp_file = NamedTemporaryFile(mode='w', delete=False)
         fields = ['username', 'password_hash', 'real_name', 'email_address']
 
         if sha256_crypt.verify(old_pass, hash_pass):
             with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"),
-                      "r") as pass_file, temp_file:
+                      "r") as pass_file:
                 reader = csv.DictReader(pass_file, fieldnames=fields)
                 writer = csv.DictWriter(temp_file, fieldnames=fields)
                 for row in reader:
@@ -103,7 +98,7 @@ def handle_update():
             shutil.move(temp_file.name, os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"))
 
         flash('Password Update Successful')
-        return redirect(url_for('show_home'))
+    return redirect(url_for('show_home', error=error))
 
 
 @app.route('/handle_login/', methods=['GET', 'POST'])
@@ -115,24 +110,34 @@ def handle_login():
         user_pass = request.form.get('password')
         hash_pass = ''
         if is_registered(username):
-            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
-                lines = csv.reader(pass_file)
-                for line in lines:
-                    if username in line:
-                        hash_pass = line[1]
-                        break
+            hash_pass = get_hash(hash_pass, username)
 
         if sha256_crypt.verify(user_pass, hash_pass):
             flash('Login Successful')
             return redirect(url_for('show_home'))
         error = 'Invalid Credentials'
 
-        with open(os.path.join(sys.path[0] + "\\" + "static\\failed_logins.txt"), "a") as pass_log:
+        fields = ['date_time', 'IP_address', 'user_name', 'pass_hash']
+        with open(os.path.join(sys.path[0] + "\\" + "static\\failed_logins.csv"), 'a',
+                  newline='') as pass_log:
+            writer = csv.DictWriter(pass_log, fieldnames=fields)
             hostname = socket.gethostname()
-            pass_log.writelines(get_date_time() + ',' + socket.gethostbyname(hostname) + ','
-                                + username + ',' + hash_pass)
+            row = {'date_time': get_date_time(), 'IP_address': socket.gethostbyname(hostname),
+                   'user_name': username, 'pass_hash': hash_pass}
+            writer.writerow(row)
 
     return render_template('login.html', error=error)
+
+
+def get_hash(hash_pass, username):
+    """Get password hash"""
+    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
+        lines = csv.reader(pass_file)
+        for line in lines:
+            if username == line[0]:
+                hash_pass = line[1]
+                break
+    return hash_pass
 
 
 @app.route('/login/')
@@ -172,10 +177,12 @@ def handle_data():
 
 def is_registered(username):
     """Checks if user is already registered"""
-    username += ', '
-    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.txt"), "r") as pass_file:
-        if username in pass_file.read():
-            return True
+
+    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
+        reader = csv.reader(pass_file)
+        for row in reader:
+            if username == row[0]:
+                return True
         return False
 
 
@@ -222,9 +229,14 @@ def complexity(password):
 def register(username, password, real_name, email_address):
     """Registers user"""
 
-    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.txt"), "a") as pass_file:
-        pass_file.writelines(username + "," + sha256_crypt.hash(password) + "," +
-                             real_name + "," + email_address)
+    fields = ['username', 'password_hash', 'real_name', 'email_address']
+
+    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), 'a',
+              newline='') as pass_file:
+        writer = csv.DictWriter(pass_file, fieldnames=fields)
+        row = {'username': username, 'password_hash': sha256_crypt.hash(
+            password), 'real_name': real_name, 'email_address': email_address}
+        writer.writerow(row)
 
 
 if __name__ == '__main__':
