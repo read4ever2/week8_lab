@@ -89,7 +89,7 @@ def handle_update():
 
         if sha256_crypt.verify(old_pass, hash_pass):
             with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"),
-                      "r") as pass_file:
+                      "r") as pass_file, temp_file:
                 reader = csv.DictReader(pass_file, fieldnames=fields)
                 writer = csv.DictWriter(temp_file, fieldnames=fields)
                 for row in reader:
@@ -185,7 +185,7 @@ def is_registered(username):
     with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
         reader = csv.reader(pass_file)
         for row in reader:
-            if username == row[0]:
+            if username in row:
                 return True
         return False
 
@@ -202,15 +202,15 @@ def special_test(input_string, special_req):
     return counter >= special_req
 
 
-def check_bad_pass(password):
+def is_bad_pass(password):
     """Checks password against common known passwords"""
     with open(os.path.join(sys.path[0] + "\\" + "static\\CommonPassword.txt"), "r") as \
             bad_pass_file:
         bad_pass_list = bad_pass_file.readlines()
 
     if password in bad_pass_list:
-        return False
-    return True
+        return True
+    return False
 
 
 def complexity(password):
@@ -225,7 +225,7 @@ def complexity(password):
                                       and sum(char.isupper() for char in password) >= upper_case_req
                                       and sum(char.isdigit() for char in password) >= digit_count
                                       and special_test(password, special_count)):
-        if check_bad_pass(password):
+        if not is_bad_pass(password):
             return True
     return False
 
