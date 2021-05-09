@@ -3,30 +3,37 @@
 <html lang="en">
 
 <head>
-    <title>Login</title>
+    <title>Update</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
 <body>
 <header>
-    <h1>Please Log In</h1>
+    <h1>Update Password</h1>
 </header>
 
 {% if error %}
     <p class=error><strong>Error:</strong> {{ error }}
 {% endif %}
 
-<form action="{{ url_for('handle_login') }}" method="post">
+<form action="{{ url_for('handle_update') }}" method="post">
     <div>
         <label for="username">Username</label>
         <input type="text" id="username" name="username">
     </div>
     <div>
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password">
+        <label for="old_password">Current Password</label>
+        <input type="password" id="old_password" name="old_password">
+    </div>
+        <div>
+        <label for="new_password">New Password</label>
+        <input type="password" id="new_password" name="new_password">
+    </div>    <div>
+        <label for="new_password2">Re-enter Password</label>
+        <input type="password" id="new_password2" name="new_password2">
     </div>
     <div>
-        <input type="submit" class="submit" value="Log In">
+        <input type="submit" class="submit" value="Update">
     </div>
 </form>
 

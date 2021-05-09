@@ -6,10 +6,14 @@ Content is basic information about Video Game console generations.
 Will Feighner
 2021 05 08
 """
+import csv
 import datetime
 import os
+import shutil
+import socket
 import string
 import sys
+from tempfile import NamedTemporaryFile
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from passlib.hash import sha256_crypt
@@ -53,6 +57,55 @@ def show_register():
     return render_template('register.html')
 
 
+@app.route('/update/', methods=['GET', 'POST'])
+def show_update():
+    """Allows user to update their password"""
+    return render_template('update.html')
+
+
+@app.route('/handle_update)', methods=['GET', 'POST'])
+def handle_update():
+    """processes update user password"""
+    error = None
+    if request.method == "Post":
+        username = request.form.get('username')
+        old_pass = request.form.get('old_password')
+        new_pass = request.form.get('new_password')
+        check_pass = request.form.get('new_password2')
+
+        if new_pass != check_pass:
+            error = 'Passwords do not match'
+            return redirect(url_for('show_update', error=error))
+
+        if is_registered(username):
+            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
+                lines = csv.reader(pass_file)
+                for line in lines:
+                    if username in line:
+                        hash_pass = line[1]
+                        break
+
+        temp_file = NamedTemporaryFile(mode='w', delete=False)
+        fields = ['username', 'password_hash', 'real_name', 'email_address']
+
+        if sha256_crypt.verify(old_pass, hash_pass):
+            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"),
+                      "r") as pass_file, temp_file:
+                reader = csv.DictReader(pass_file, fieldnames=fields)
+                writer = csv.DictWriter(temp_file, fieldnames=fields)
+                for row in reader:
+                    if row['username'] == username:
+                        row = {'username': row['username'], 'password_hash': sha256_crypt.hash(
+                            new_pass), 'real_name': row['real_name'], 'email_address': row[
+                            'email_address']}
+                        writer.writerow(row)
+
+            shutil.move(temp_file.name, os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"))
+
+        flash('Password Update Successful')
+        return redirect(url_for('show_home'))
+
+
 @app.route('/handle_login/', methods=['GET', 'POST'])
 def handle_login():
     """Process login by finding username and comparing password hashes"""
@@ -62,17 +115,23 @@ def handle_login():
         user_pass = request.form.get('password')
         hash_pass = ''
         if is_registered(username):
-            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.txt"), "r") as pass_file:
-                lines = pass_file.readlines()
+            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
+                lines = csv.reader(pass_file)
                 for line in lines:
                     if username in line:
-                        hash_pass = line.split(', ')[1]
+                        hash_pass = line[1]
                         break
 
         if sha256_crypt.verify(user_pass, hash_pass):
             flash('Login Successful')
             return redirect(url_for('show_home'))
         error = 'Invalid Credentials'
+
+        with open(os.path.join(sys.path[0] + "\\" + "static\\failed_logins.txt"), "a") as pass_log:
+            hostname = socket.gethostname()
+            pass_log.writelines(get_date_time() + ',' + socket.gethostbyname(hostname) + ','
+                                + username + ',' + hash_pass)
+
     return render_template('login.html', error=error)
 
 
@@ -113,7 +172,6 @@ def handle_data():
 
 def is_registered(username):
     """Checks if user is already registered"""
-    print(os.path.join(sys.path[0] + "\\" + "static\\pass_file.txt"))
     username += ', '
     with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.txt"), "r") as pass_file:
         if username in pass_file.read():
@@ -133,6 +191,17 @@ def special_test(input_string, special_req):
     return counter >= special_req
 
 
+def check_bad_pass(password):
+    """Checks password against common known passwords"""
+    with open(os.path.join(sys.path[0] + "\\" + "static\\CommonPassword.txt"), "r") as \
+            bad_pass_file:
+        bad_pass_list = bad_pass_file.readlines()
+
+    if password in bad_pass_list:
+        return False
+    return True
+
+
 def complexity(password):
     """Checks password complexity"""
     lower_case_req = 1
@@ -145,7 +214,8 @@ def complexity(password):
                                       and sum(char.isupper() for char in password) >= upper_case_req
                                       and sum(char.isdigit() for char in password) >= digit_count
                                       and special_test(password, special_count)):
-        return True
+        if check_bad_pass(password):
+            return True
     return False
 
 
@@ -153,8 +223,8 @@ def register(username, password, real_name, email_address):
     """Registers user"""
 
     with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.txt"), "a") as pass_file:
-        pass_file.writelines("\n" + username + ", " + sha256_crypt.hash(password) + ", " +
-                             real_name + ", " + email_address)
+        pass_file.writelines(username + "," + sha256_crypt.hash(password) + "," +
+                             real_name + "," + email_address)
 
 
 if __name__ == '__main__':

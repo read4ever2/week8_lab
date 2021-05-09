@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-	<title>Registration</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <title>Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
 <body>
 
-	{% if error %}
-	<p class=error><strong>Error:</strong> {{ error }}
-    {% endif %}
+{% if error %}
+    <p class=error><strong>Error:</strong> {{ error }}
+{% endif %}
 
 <form action="{{ url_for('handle_data') }}" method="post">
     <div>

@@ -3,35 +3,35 @@
 <html lang="en">
 
 <head>
-	<title>Video Game Console Generations</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <title>Video Game Console Generations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
 <body>
-	<header>
-		<h1>
-			Welcome to the Video Game Console Information Site
-		</h1>
-	</header>
-	<h1>
-		9th (Current) Generation Consoles
-	</h1>
+<header>
+    <h1>
+        Welcome to the Video Game Console Information Site
+    </h1>
+</header>
+<h1>
+    9th (Current) Generation Consoles
+</h1>
 
-	{% with messages = get_flashed_messages() %} {% if messages %}
-	<ul class=flashes>
-		{% for message in messages %}
-		<li>{{ message }}</li>
-		{% endfor %}
-	</ul>
-	{% endif %} {% endwith %}
+{% with messages = get_flashed_messages() %} {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %} {% endwith %}
 
-	<div style="width: 100%">
-		<div style="width: 50%; float: left;align-content: center">
-			<ul>
-				<li><a href="https://www.playstation.com/en-us/ps5/">
-						<h2>Sony Playstation 5</h2>
-					</a>
-					<br>
+<div style="width: 100%">
+    <div style="width: 50%; float: left;align-content: center">
+        <ul>
+            <li><a href="https://www.playstation.com/en-us/ps5/">
+                <h2>Sony Playstation 5</h2>
+            </a>
+                <br>
                 <img src="../static/PlayStation_5_and_DualSense_with_transparent_background.png"
                      alt="Image of Playstation 5" width="200">
                 <br>Disc Model<br>
@@ -68,6 +68,7 @@
 <ul>
     <li><a href="{{ url_for('show_login') }}"><h3>Site Login</h3></a></li>
     <li><a href="{{ url_for('show_register') }}"><h3>Site Registration</h3></a></li>
+    <li><a href="{{ url_for('show_update') }}"><h3>Site Login</h3></a></li>
     <li><a href="{{ url_for('show_8th_gen') }}"><h3>8th Generation</h3></a></li>
     <li><a href="{{ url_for('show_previous') }}"><h3>Previous Generations</h3></a></li>
     <li><a href="{{ url_for('show_about') }}"><h3>About</h3></a></li>
