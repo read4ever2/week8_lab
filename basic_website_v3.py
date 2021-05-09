@@ -77,6 +77,10 @@ def handle_update():
             error = 'Passwords do not match'
             return redirect(url_for('show_update', error=error))
 
+        if complexity(new_pass):
+            error = 'Password not complex enough'
+            return redirect(url_for('show_update', error=error))
+
         hash_pass = ''
         hash_pass = get_hash(hash_pass, username)
 
