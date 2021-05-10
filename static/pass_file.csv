@@ -1,3 +1,1 @@
-username,password_hash,real_name,email_address
-bob,$5$rounds=535000$g4ibRRGEMwEnJCxm$nuMvTth6tJU/diSMpFeaW4l1KHmTQjV0cGmMfC205a/,bob,b@b.com
-alice1991,$5$rounds=535000$nXM8YSaVXbdQULVP$09IiOIJ.cw0gdsnk5tcYS9NAkaQ0/QK2.CPRgsyirXA,alice,a@a.com
+username,password_hash,real_name,email_addressbob,$5$rounds=535000$RUO3VslKZ.qvPA7s$ztx6sF1m9IXrs0bCCs9TFa9qEbpo4Hqv7D7G38jA3nB,bob,b@b.comalice1991,$5$rounds=535000$nXM8YSaVXbdQULVP$09IiOIJ.cw0gdsnk5tcYS9NAkaQ0/QK2.CPRgsyirXA,alice,a@a.com

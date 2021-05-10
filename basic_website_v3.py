@@ -119,10 +119,10 @@ def handle_login():
         hash_pass = ''
         if is_registered(username):
             hash_pass = get_hash(hash_pass, username)
-
-        if sha256_crypt.verify(user_pass, hash_pass):
-            flash('Login Successful')
-            return redirect(url_for('show_home'))
+            if sha256_crypt.verify(user_pass, hash_pass):
+                flash('Login Successful')
+                return redirect(url_for('show_home'))
+        hash_pass = sha256_crypt.hash(user_pass)
         error = 'Invalid Credentials'
 
         fields = ['date_time', 'IP_address', 'user_name', 'pass_hash']
