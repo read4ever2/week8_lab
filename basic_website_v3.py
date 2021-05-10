@@ -63,13 +63,17 @@ def show_update():
 
 @app.route('/handle_update)', methods=['GET', 'POST'])
 def handle_update():
-    """processes update user password"""
+    """Processes update user password"""
     error = None
     if request.method == "POST":
         username = request.form.get('username')
         old_pass = request.form.get('old_password')
         new_pass = request.form.get('new_password')
         check_pass = request.form.get('new_password2')
+
+        if not is_registered(username):
+            error = 'User is not registered'
+            return redirect(url_for('show_update', error=error))
 
         if new_pass != check_pass:
             error = 'Passwords do not match'
@@ -171,7 +175,7 @@ def handle_data():
     elif is_registered(username):
         error = 'You are already registered'
     elif not complexity(password) or is_bad_pass(password):
-        error = 'Make your password more complex.It must be at least 12 characters in length,   ' \
+        error = 'Make your password more complex. It must be at least 12 characters in length, ' \
                 'and include at least 1 uppercase character, 1 lowercase character, 1 number and ' \
                 '1 special character.'
 
