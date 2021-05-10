@@ -88,7 +88,7 @@ def handle_update():
             with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r+",
                       newline="") as pass_file:
                 reader = csv.DictReader(pass_file, fieldnames=fields)
-                header = next(reader)
+                next(reader)
 
                 for line in reader:
                     if line['username'] == username:
