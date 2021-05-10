@@ -9,11 +9,9 @@ Will Feighner
 import csv
 import datetime
 import os
-import shutil
 import socket
 import string
 import sys
-from tempfile import NamedTemporaryFile
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from passlib.hash import sha256_crypt
@@ -77,31 +75,37 @@ def handle_update():
             error = 'Passwords do not match'
             return redirect(url_for('show_update', error=error))
 
-        if complexity(new_pass):
+        if not complexity(new_pass) or is_bad_pass(new_pass):
             error = 'Password not complex enough'
             return redirect(url_for('show_update', error=error))
 
         hash_pass = ''
         hash_pass = get_hash(hash_pass, username)
 
-        temp_file = NamedTemporaryFile(mode='w', delete=False)
-        fields = ['username', 'password_hash', 'real_name', 'email_address']
-
         if sha256_crypt.verify(old_pass, hash_pass):
-            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"),
-                      "r") as pass_file, temp_file:
+            fields = ['username', 'password_hash', 'real_name', 'email_address']
+            temp_data = []
+            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r+",
+                      newline="") as pass_file:
                 reader = csv.DictReader(pass_file, fieldnames=fields)
-                writer = csv.DictWriter(temp_file, fieldnames=fields)
-                for row in reader:
-                    if row['username'] == username:
-                        row = {'username': row['username'], 'password_hash': sha256_crypt.hash(
-                            new_pass), 'real_name': row['real_name'], 'email_address': row[
-                            'email_address']}
-                        writer.writerow(row)
+                header = next(reader)
 
-            shutil.move(temp_file.name, os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"))
+                for line in reader:
+                    if line['username'] == username:
+                        line['password_hash'] = sha256_crypt.hash(new_pass)
+                    temp_data.append(line)
 
-        flash('Password Update Successful')
+            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "w",
+                      newline="") as pass_file:
+                writer = csv.DictWriter(pass_file, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(temp_data)
+
+            flash('Password Update Successful')
+        else:
+            error = 'Current Password not correct'
+            return redirect(url_for('show_update', error=error))
+
     return redirect(url_for('show_home', error=error))
 
 
@@ -166,7 +170,7 @@ def handle_data():
         error = 'Please enter your Password.'
     elif is_registered(username):
         error = 'You are already registered'
-    elif not complexity(password):
+    elif not complexity(password) or is_bad_pass(password):
         error = 'Make your password more complex.It must be at least 12 characters in length,   ' \
                 'and include at least 1 uppercase character, 1 lowercase character, 1 number and ' \
                 '1 special character.'
@@ -225,8 +229,7 @@ def complexity(password):
                                       and sum(char.isupper() for char in password) >= upper_case_req
                                       and sum(char.isdigit() for char in password) >= digit_count
                                       and special_test(password, special_count)):
-        if not is_bad_pass(password):
-            return True
+        return True
     return False
 
 
