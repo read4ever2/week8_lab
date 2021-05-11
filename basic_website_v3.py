@@ -71,23 +71,19 @@ def handle_update():
         new_pass = request.form.get('new_password')
         check_pass = request.form.get('new_password2')
 
-        if not is_registered(username):
-            error = 'User is not registered'
-
         hash_pass = ''
         hash_pass = get_hash(hash_pass, username)
 
-        if not sha256_crypt.verify(old_pass, hash_pass):
+        if not is_registered(username):
+            error = 'User is not registered'
+        elif not sha256_crypt.verify(old_pass, hash_pass):
             error = 'Current Password incorrect'
-
-        if new_pass != check_pass:
+        elif new_pass != check_pass:
             error = 'Passwords do not match'
-
-        if is_bad_pass(new_pass):
-            error = 'Password too common'
-
-        if not is_complex(new_pass):
+        elif not is_complex(new_pass):
             error = 'Password not complex enough'
+        elif is_bad_pass(new_pass):
+            error = 'Password too common'
 
         if error is not None:
             return render_template('update.html', error=error)
@@ -112,9 +108,6 @@ def handle_update():
                 writer.writerows(temp_data)
 
             flash('Password Update Successful')
-        else:
-            error = 'Current Password not correct'
-            return redirect(url_for('show_update', error=error))
 
     return redirect(url_for('show_home', error=error))
 
@@ -135,6 +128,7 @@ def handle_login():
         hash_pass = sha256_crypt.hash(user_pass)
         error = 'Invalid Credentials'
 
+        # log failed attempt
         fields = ['date_time', 'IP_address', 'user_name', 'pass_hash']
         with open(os.path.join(sys.path[0] + "/static/failed_logins.csv"), 'a',
                   newline='') as pass_log:
@@ -184,9 +178,7 @@ def handle_data():
         error = 'Make your password more complex. It must be at least 12 characters in length, ' \
                 'and include at least 1 uppercase character, 1 lowercase character, 1 number and ' \
                 '1 special character.'
-
-    if is_bad_pass(password):
-        print("Password is too common. Please pick a more secret password.")
+    elif is_bad_pass(password):
         error = "Password is too common. Please pick a more secret password."
 
     if error is None:
