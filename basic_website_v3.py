@@ -55,7 +55,7 @@ def show_register():
     return render_template('register.html')
 
 
-@app.route('/update/', methods=['GET', 'POST'])
+@app.route('/update/')
 def show_update():
     """Allows user to update their password"""
     return render_template('update.html')
@@ -73,23 +73,29 @@ def handle_update():
 
         if not is_registered(username):
             error = 'User is not registered'
-            return redirect(url_for('show_update', error=error))
-
-        if new_pass != check_pass:
-            error = 'Passwords do not match'
-            return redirect(url_for('show_update', error=error))
-
-        if not complexity(new_pass) or is_bad_pass(new_pass):
-            error = 'Password not complex enough'
-            return redirect(url_for('show_update', error=error))
 
         hash_pass = ''
         hash_pass = get_hash(hash_pass, username)
 
+        if not sha256_crypt.verify(old_pass, hash_pass):
+            error = 'Current Password incorrect'
+
+        if new_pass != check_pass:
+            error = 'Passwords do not match'
+
+        if is_bad_pass(new_pass):
+            error = 'Password too common'
+
+        if not is_complex(new_pass):
+            error = 'Password not complex enough'
+
+        if error is not None:
+            return render_template('update.html', error=error)
+
         if sha256_crypt.verify(old_pass, hash_pass):
             fields = ['username', 'password_hash', 'real_name', 'email_address']
             temp_data = []
-            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r+",
+            with open(os.path.join(sys.path[0] + "/static/pass_file.csv"), "r+",
                       newline="") as pass_file:
                 reader = csv.DictReader(pass_file, fieldnames=fields)
                 next(reader)
@@ -99,7 +105,7 @@ def handle_update():
                         line['password_hash'] = sha256_crypt.hash(new_pass)
                     temp_data.append(line)
 
-            with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "w",
+            with open(os.path.join(sys.path[0] + "/static/pass_file.csv"), "w",
                       newline="") as pass_file:
                 writer = csv.DictWriter(pass_file, fieldnames=fields)
                 writer.writeheader()
@@ -130,7 +136,7 @@ def handle_login():
         error = 'Invalid Credentials'
 
         fields = ['date_time', 'IP_address', 'user_name', 'pass_hash']
-        with open(os.path.join(sys.path[0] + "\\" + "static\\failed_logins.csv"), 'a',
+        with open(os.path.join(sys.path[0] + "/static/failed_logins.csv"), 'a',
                   newline='') as pass_log:
             writer = csv.DictWriter(pass_log, fieldnames=fields)
             hostname = socket.gethostname()
@@ -143,7 +149,7 @@ def handle_login():
 
 def get_hash(hash_pass, username):
     """Get password hash"""
-    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
+    with open(os.path.join(sys.path[0] + "/static/pass_file.csv"), "r") as pass_file:
         lines = csv.reader(pass_file)
         for line in lines:
             if username == line[0]:
@@ -174,10 +180,14 @@ def handle_data():
         error = 'Please enter your Password.'
     elif is_registered(username):
         error = 'You are already registered'
-    elif not complexity(password) or is_bad_pass(password):
+    elif not is_complex(password):
         error = 'Make your password more complex. It must be at least 12 characters in length, ' \
                 'and include at least 1 uppercase character, 1 lowercase character, 1 number and ' \
                 '1 special character.'
+
+    if is_bad_pass(password):
+        print("Password is too common. Please pick a more secret password.")
+        error = "Password is too common. Please pick a more secret password."
 
     if error is None:
         register(username, password, real_name, email)
@@ -190,7 +200,7 @@ def handle_data():
 def is_registered(username):
     """Checks if user is already registered"""
 
-    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), "r") as pass_file:
+    with open(os.path.join(sys.path[0] + "/static/pass_file.csv"), "r") as pass_file:
         reader = csv.reader(pass_file)
         for row in reader:
             if username in row:
@@ -212,16 +222,16 @@ def special_test(input_string, special_req):
 
 def is_bad_pass(password):
     """Checks password against common known passwords"""
-    with open(os.path.join(sys.path[0] + "\\" + "static\\CommonPassword.txt"), "r") as \
+    with open(os.path.join(sys.path[0] + "/static/CommonPassword.txt"), "r") as \
             bad_pass_file:
         bad_pass_list = bad_pass_file.readlines()
 
-    if password in bad_pass_list:
+    if password + '\n' in bad_pass_list:
         return True
     return False
 
 
-def complexity(password):
+def is_complex(password):
     """Checks password complexity"""
     lower_case_req = 1
     upper_case_req = 1
@@ -242,7 +252,7 @@ def register(username, password, real_name, email_address):
 
     fields = ['username', 'password_hash', 'real_name', 'email_address']
 
-    with open(os.path.join(sys.path[0] + "\\" + "static\\pass_file.csv"), 'a',
+    with open(os.path.join(sys.path[0] + "/static/pass_file.csv"), 'a',
               newline='') as pass_file:
         writer = csv.DictWriter(pass_file, fieldnames=fields)
         row = {'username': username, 'password_hash': sha256_crypt.hash(
