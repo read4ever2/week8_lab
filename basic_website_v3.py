@@ -82,7 +82,8 @@ def handle_update():
             error = 'Passwords do not match'
         elif not is_complex(new_pass):
             error = 'Password not complex enough'
-        elif is_bad_pass(new_pass):
+
+        if is_bad_pass(new_pass):
             error = 'Password too common'
 
         if error is not None:

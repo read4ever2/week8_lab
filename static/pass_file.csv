@@ -2,3 +2,4 @@ username,password_hash,real_name,email_address
 bob,$5$rounds=535000$RUO3VslKZ.qvPA7s$ztx6sF1m9IXrs0bCCs9TFa9qEbpo4Hqv7D7G38jA3nB,bob,b@b.com
 alice1991,$5$rounds=535000$nXM8YSaVXbdQULVP$09IiOIJ.cw0gdsnk5tcYS9NAkaQ0/QK2.CPRgsyirXA,alice,a@a.com
 doug,$5$rounds=535000$kZA4sEdjo37Ql1Wl$SwICQ7JD0BynDIbTiUC4Lb8biF.6Fw10rUTeYJSiTKB,doug,d@d.com
+SuperEd,$5$rounds=535000$hp.mdQAtdNuD2HTN$2sWFJlBbzEAr8NjZDw9My4uq4wAEw5F51TY6uPUAAA5,Ed Eddington,ed@ed.com
